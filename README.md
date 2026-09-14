@@ -26,7 +26,7 @@ Este repositório reúne os relatórios técnicos (*write-ups*), comandos utiliz
 
 ## 🧩 Detalhamento Técnico dos Desafios
 
-### 1. Import IoT & Setup
+### ⚡1. Import IoT & Setup
 * **Foco:** Provisionamento e validação de integridade do ambiente vulnerável OWASP IoTGoat.
 * **Metodologia:** Descompressão da imagem crua de disco, checagem da integridade de dados via hash criptográfico SHA-256 e montagem em ambiente isolado via emulador de arquitetura.
 ### ⚙Comandos Chave:
