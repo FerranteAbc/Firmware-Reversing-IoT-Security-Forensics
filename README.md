@@ -34,6 +34,8 @@ Este repositório reúne os relatórios técnicos (*write-ups*), comandos utiliz
   sha256sum IoTGoat-x86.img.gz
   gunzip IoTGoat-x86.img.gz
   ```
+**Write-up completo:** [`iot-firmware-hacking/import-iot-setup/`](iot-firmware-hacking/import-iot-setup/writeup.md)
+
 ### ⚡2. Hardware Hacking & Extração de Firmware
 Foco: Reconstituição da árvore de diretórios do sistema de arquivos (rootfs) a partir de um dump binário bruto de memória flash.
 
@@ -48,6 +50,7 @@ binwalk -Me firmware.bin
 # Extração estruturada do sistema de arquivos
 unsquashfs -d extracted_rootfs filesystem.squashfs
 ```
+**Write-up completo:** [`iot-firmware-hacking/hardware-hacking-extracao/`](iot-firmware-hacking/hardware-hacking-extracao/writeup.md) · **Script de apoio:** [`scripts/extract_firmware.sh`](scripts/extract_firmware.sh)
 
 ### ⚡3. Goat Init
 Foco: Auditoria em vetores de inicialização do sistema operacional embarcado.
@@ -60,6 +63,7 @@ Metodologia: Análise estática nos scripts executados durante a sequência de b
 cat extracted_rootfs/etc/rc.local
 grep -rni "flag" extracted_rootfs/etc/init.d/
 ```
+**Write-up completo:** [`iot-firmware-hacking/iotgoat-challenges/goat-init/`](iot-firmware-hacking/iotgoat-challenges/goat-init/writeup.md)
 
 ### ⚡4. Goat MD5
 Foco: Criptoanálise de rotinas de verificação de integridade e autenticação.
@@ -73,6 +77,7 @@ Metodologia: Identificação de hashes MD5 estáticos inseridos no código de ve
 echo -n "hash_encontrado" > target_hash.txt
 john --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt target_hash.txt
 ```
+**Write-up completo:** [`iot-firmware-hacking/iotgoat-challenges/goat-md5/`](iot-firmware-hacking/iotgoat-challenges/goat-md5/writeup.md) · **Script de apoio:** [`scripts/hash_verifier.py`](scripts/hash_verifier.py)
 
 ### ⚡5. Goat Backdoor
 Foco: Caça a serviços não convencionais e portas de depuração expostas.
@@ -85,6 +90,7 @@ Metodologia: Varredura recursiva nos diretórios de executáveis (/bin, /sbin, /
 grep -rn "nc -l" extracted_rootfs/
 strings extracted_rootfs/usr/bin/backdoor_bin | grep -E "(sh|bash|flag)"
 ```
+**Write-up completo:** [`iot-firmware-hacking/iotgoat-challenges/goat-backdoor/`](iot-firmware-hacking/iotgoat-challenges/goat-backdoor/writeup.md)
 
 ### ⚡6. Goat Kernel
 Foco: Inspeção de segurança em módulos de kernel compilados (.ko).
@@ -97,6 +103,7 @@ Metodologia: Auditoria de parâmetros de módulos proprietários inseridos em /l
 find extracted_rootfs/lib/modules/ -name "*.ko"
 modinfo extracted_rootfs/lib/modules/*/custom_module.ko
 ```
+**Write-up completo:** [`iot-firmware-hacking/iotgoat-challenges/goat-kernel/`](iot-firmware-hacking/iotgoat-challenges/goat-kernel/writeup.md)
 
 ### ⚡7. E-mail Suspeito
 Foco: Forense em comunicações corporativas e detecção de phishing/spoofing.
@@ -109,6 +116,7 @@ Metodologia: Rastreamento estrutural de cabeçalhos RFC 822 de baixo para cima (
 grep -iE "(Received:|Received-SPF|Authentication-Results)" email_amostra.eml
 base64 -d payload_encoded.txt
 ```
+**Write-up completo:** [`forensics-artifacts/email-suspeito/`](forensics-artifacts/email-suspeito/writeup.md)
 
 ### ⚡8. Documento Perdido
 Foco: File carving e extração de artefatos em camadas de metadados.
@@ -118,27 +126,27 @@ Metodologia: Perícia em documentos digitais (PDF/Office) para recuperar revisõ
 ### ⚙Comandos Chave:
 
  ```bash
-Auditoria completa de metadados não visíveis
+# Auditoria completa de metadados não visíveis
 exiftool -a -u documento_alvo.pdf
 
-
-Inspeção de objetos e fluxos internos em arquivos PDF
+# Inspeção de objetos e fluxos internos em arquivos PDF
 pdfid documento_alvo.pdf
-pdf-parser --search "flag" documento_alvo.pdf  
+pdf-parser --search "flag" documento_alvo.pdf
 ```
+**Write-up completo:** [`forensics-artifacts/documento-perdido/`](forensics-artifacts/documento-perdido/writeup.md)
 ## 📋 Resumo das Fases & Status
 
 
-| Desafio | Alvo / Vetor | Técnica Principal | Ferramentas Chave | Status |
-| :--- | :--- | :--- | :--- | :---: |
-| **Import IoT** | Ambiente IoTGoat | Provisionamento e validação de integridade | `sha256sum`, `gunzip`, QEMU | `[Concluído]` |
-| **Hardware Hacking** | Dump de Firmware | Varredura de assinaturas e extração de rootfs | `binwalk`, `unsquashfs`, `dd` | `[Concluído]` |
-| **Goat Init** | `/etc/rc.local` e `init.d` | Análise estática de rotinas e scripts de boot | `grep`, `cat`, editores Linux | `[Concluído]` |
-| **Goat MD5** | Criptografia Estática | Reversão de hash via ataque de dicionário | `md5sum`, John the Ripper, RockYou | `[Concluído]` |
-| **Goat Backdoor** | Binários e Daemons | Identificação de listeners e shells ocultas | `strings`, `netstat`, `nmap`, `grep` | `[Concluído]` |
-| **Goat Kernel** | Módulos `.ko` | Inspeção de drivers e análise de privilégios | `modinfo`, `find`, `strings` | `[Concluído]` |
-| **E-mail Suspeito** | RFC 822 / Cabeçalhos | Rastreamento SMTP e validação SPF/DKIM | Editores RFC, `grep`, CyberChef | `[Concluído]` |
-| **Documento Perdido** | Estrutura de Arquivo | File carving e extração de metadados ocultos | `exiftool`, `pdfid`, `pdf-parser` | `[Concluído]` |
+| Desafio | Alvo / Vetor | Técnica Principal | Ferramentas Chave | Status | Write-up |
+| :--- | :--- | :--- | :--- | :---: | :--- |
+| **Import IoT** | Ambiente IoTGoat | Provisionamento e validação de integridade | `sha256sum`, `gunzip`, QEMU | `[Concluído]` | [`import-iot-setup/`](iot-firmware-hacking/import-iot-setup/writeup.md) |
+| **Hardware Hacking** | Dump de Firmware | Varredura de assinaturas e extração de rootfs | `binwalk`, `unsquashfs`, `dd` | `[Concluído]` | [`hardware-hacking-extracao/`](iot-firmware-hacking/hardware-hacking-extracao/writeup.md) |
+| **Goat Init** | `/etc/rc.local` e `init.d` | Análise estática de rotinas e scripts de boot | `grep`, `cat`, editores Linux | `[Concluído]` | [`goat-init/`](iot-firmware-hacking/iotgoat-challenges/goat-init/writeup.md) |
+| **Goat MD5** | Criptografia Estática | Reversão de hash via ataque de dicionário | `md5sum`, John the Ripper, RockYou | `[Concluído]` | [`goat-md5/`](iot-firmware-hacking/iotgoat-challenges/goat-md5/writeup.md) |
+| **Goat Backdoor** | Binários e Daemons | Identificação de listeners e shells ocultas | `strings`, `netstat`, `nmap`, `grep` | `[Concluído]` | [`goat-backdoor/`](iot-firmware-hacking/iotgoat-challenges/goat-backdoor/writeup.md) |
+| **Goat Kernel** | Módulos `.ko` | Inspeção de drivers e análise de privilégios | `modinfo`, `find`, `strings` | `[Concluído]` | [`goat-kernel/`](iot-firmware-hacking/iotgoat-challenges/goat-kernel/writeup.md) |
+| **E-mail Suspeito** | RFC 822 / Cabeçalhos | Rastreamento SMTP e validação SPF/DKIM | Editores RFC, `grep`, CyberChef | `[Concluído]` | [`email-suspeito/`](forensics-artifacts/email-suspeito/writeup.md) |
+| **Documento Perdido** | Estrutura de Arquivo | File carving e extração de metadados ocultos | `exiftool`, `pdfid`, `pdf-parser` | `[Concluído]` | [`documento-perdido/`](forensics-artifacts/documento-perdido/writeup.md) |
 
 ---
 
@@ -146,37 +154,23 @@ pdf-parser --search "flag" documento_alvo.pdf
 ```text
 .
 ├── iot-firmware-hacking/
-│   ├── iotgoat-setup/
-│   │   ├── README.md
-│   │   └── import-iot.md
-│   ├── iotgoat-challenges/
-│   │   ├── goat-init/
-│   │   │   └── writeup.md
-│   │   ├── goat-md5/
-│   │   │   ├── wordlist-cracking.md
-│   │   │   └── writeup.md
-│   │   ├── goat-backdoor/
-│   │   │   └── writeup.md
-│   │   └── goat-kernel/
-│   │       └── writeup.md
-│   └── hardware-methods/
-│       ├── dump-extraction-notes.md
-│       └── binwalk-analysis.md
+│   ├── import-iot-setup/
+│   │   └── writeup.md
+│   ├── hardware-hacking-extracao/
+│   │   └── writeup.md
+│   └── iotgoat-challenges/
+│       ├── goat-init/writeup.md
+│       ├── goat-md5/writeup.md
+│       ├── goat-backdoor/writeup.md
+│       └── goat-kernel/writeup.md
 ├── forensics-artifacts/
 │   ├── email-suspeito/
-│   │   ├── evidences/
-│   │   │   └── email_headers_sample.txt
-│   │   ├── header-analysis.md
 │   │   └── writeup.md
 │   └── documento-perdido/
-│       ├── evidences/
-│       │   └── metadata-extracted.json
-│       ├── carving-notes.md
 │       └── writeup.md
 ├── scripts/
 │   ├── hash_verifier.py
 │   └── extract_firmware.sh
-├── LICENSE
 └── README.md
 ```
 👤 Autor
